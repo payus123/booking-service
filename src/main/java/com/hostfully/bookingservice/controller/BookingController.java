@@ -13,8 +13,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +44,7 @@ public class BookingController {
     public ResponseEntity<Wrapper<BookingResponse>> createBooking(@Validated  @RequestBody BookingRequest request) {
         return ResponseBuilder.success(bookingService.createBooking(request));
     }
-    @PostMapping(UPDATE_BOOKING)
+    @PatchMapping(UPDATE_BOOKING)
     public ResponseEntity<Wrapper<BookingResponse>> updateBooking(@Validated  @RequestBody BookingUpdateRequest request) {
         return ResponseBuilder.success(bookingService.updateBooking(request));
     }
@@ -64,7 +66,7 @@ public class BookingController {
     public ResponseEntity<Wrapper<BlockResponse>> createBlock(@Valid @RequestBody BlockRequest request) {
         return ResponseBuilder.success(bookingService.createBlock(request));
     }
-    @PostMapping(DELETE_BLOCK)
+    @DeleteMapping(DELETE_BLOCK)
     public ResponseEntity<Wrapper<BlockResponse>> deleteBlock(@RequestParam String blockId) {
         return ResponseBuilder.success(bookingService.deleteBlock(blockId));
     }

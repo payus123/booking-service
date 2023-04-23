@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import static com.hostfully.bookingservice.annotations.DateFormatValidator.isValidFormat;
 import static com.hostfully.bookingservice.models.dtos.response.BlockResponse.getBlockResponse;
@@ -41,10 +40,6 @@ public class BookingService {
     private final BlockRepository blockRepository;
     private final BookingRepository bookingRepository;
 
-    public static boolean checkIfParamHasNull(List<Objects> params) {
-        return Stream.of(params).noneMatch(Objects::isNull);
-
-    }
 
     public static void checkStartDateIsBeforeEndDate(Date startDate, Date endDate) {
         if ((startDate.after(endDate))) {
@@ -86,7 +81,7 @@ public class BookingService {
     @Transactional
     public BookingResponse updateBooking(BookingUpdateRequest request) {
         String bookingId = request.getBookingId();
-        BookingResponse response = new BookingResponse();
+        BookingResponse response;
         Booking booking = findBooking(bookingId);
         switch (BookingAction.valueOf(request.getAction())) {
 
@@ -200,7 +195,7 @@ public class BookingService {
                 .startDate(booking.getStartDate())
                 .endDate(booking.getEndDate())
                 .build());
-        
+
         return bookingRepository.save(bookingToRebook);
 
     }
