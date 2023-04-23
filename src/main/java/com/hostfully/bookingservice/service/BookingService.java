@@ -94,6 +94,7 @@ public class BookingService {
 
             case REBOOK -> response = getBookingResponse(rebook(request, booking), "Booking Rebooked");
 
+            default -> throw new BookingApplicationException("Action not Valid: must be CANCEL or REBOOK");
 
         }
         return response;
@@ -175,15 +176,15 @@ public class BookingService {
 
     @SneakyThrows
     private Booking rebook(BookingUpdateRequest updateRequest, Booking booking) {
-        Date requestStartDate = resolveDate((String) updateRequest.getParams().get("startDate"));
-        Date requestEndDate = resolveDate((String) updateRequest.getParams().get("enDate"));
+        String requestStartDate = (String) updateRequest.getParams().get("startDate");
+        String requestEndDate = (String) updateRequest.getParams().get("enDate");
         String requestGuestName = (String) updateRequest.getParams().get("guestName");
         //Did not collect propertyName because ideally it's rebooking
-        Date startDate = Objects.isNull(requestStartDate) ? booking.getStartDate() : requestStartDate;
-        Date endDate = Objects.isNull(requestEndDate) ? booking.getEndDate() : requestEndDate;
+        Date startDate = Objects.isNull(requestStartDate) ? booking.getStartDate() : resolveDate(requestStartDate);
+        Date endDate =  Objects.isNull(requestEndDate) ? booking.getEndDate() : resolveDate(requestEndDate);
         String guestName = Objects.isNull(requestGuestName) ? booking.getPropertyName() : requestGuestName;
         checkStartDateIsBeforeEndDate(startDate, endDate);
-        checkIfBlocked(startDate, endDate, booking.getPropertyName());
+
         Booking bookingToRebook = cancelBooking(booking);
         bookingToRebook.setBookingStatus(BookingStatus.BOOKED);
         bookingToRebook.setGuestName(guestName);
@@ -191,6 +192,15 @@ public class BookingService {
         bookingToRebook.setEndDate(endDate);
         bookingToRebook.setPropertyName(booking.getPropertyName());
 
+
+
+        blockRepository.save(Block.builder().propertyName(
+                        booking.getPropertyName())
+                .bookingId(booking)
+                .startDate(booking.getStartDate())
+                .endDate(booking.getEndDate())
+                .build());
+        
         return bookingRepository.save(bookingToRebook);
 
     }
