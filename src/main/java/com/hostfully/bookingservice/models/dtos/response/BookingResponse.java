@@ -21,6 +21,7 @@ public class BookingResponse {
     @JsonFormat(pattern = CommonConstants.DATETIME_FORMAT)
     private String endDate;
     private String actionPerformed;
+    private String status;
 
 
     public static BookingResponse  getBookingResponse(Booking booking, String actionPerformed){
@@ -30,6 +31,7 @@ public class BookingResponse {
                 .endDate(booking.getEndDate().toString())
                 .actionPerformed(actionPerformed)
                 .guestName(booking.getGuestName())
+                .status(booking.getBookingStatus().name())
                 .bookingId(booking.getUniqueId()).build();
     }
 }

@@ -11,8 +11,14 @@ spring:
    hibernate:
      ddlAuto: update
 
+
+  data:
+    web:
+      pageable:
+        one-indexed-parameters=true:
 logging:
   level:
     com:
       hostfully:
        bookingservice: debug
+

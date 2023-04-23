@@ -8,6 +8,7 @@ import com.hostfully.bookingservice.models.Booking;
 import com.hostfully.bookingservice.models.dtos.request.BlockRequest;
 import com.hostfully.bookingservice.models.dtos.request.BookingRequest;
 import com.hostfully.bookingservice.models.dtos.request.BookingUpdateRequest;
+import com.hostfully.bookingservice.models.dtos.request.PageDto;
 import com.hostfully.bookingservice.models.dtos.response.BlockResponse;
 import com.hostfully.bookingservice.models.dtos.response.BookingResponse;
 import com.hostfully.bookingservice.repositories.BlockRepository;
@@ -15,11 +16,15 @@ import com.hostfully.bookingservice.repositories.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -41,11 +46,10 @@ public class BookingService {
 
     }
 
-    public static boolean checkStartDateIsBeforeEndDate(Date startDate, Date endDate) {
+    public static void checkStartDateIsBeforeEndDate(Date startDate, Date endDate) {
         if ((startDate.after(endDate))) {
             throw new BookingApplicationException("startDate cannot be after endDate");
         }
-        return true;
     }
 
     @SneakyThrows
@@ -94,6 +98,20 @@ public class BookingService {
         }
         return response;
 
+    }
+
+    public List<BookingResponse> fetchAllBookings(PageDto pageDto){
+         Pageable pageable = PageRequest.of(pageDto.getPageNo(), pageDto.getPageSize(), Sort.by("id").descending());
+        List<BookingResponse> bookingResponseList = new ArrayList<>();
+         bookingRepository.findAll(pageable).stream().forEach(b->bookingResponseList.add(getBookingResponse(b,"read all bookings")));
+         return bookingResponseList;
+    }
+
+    public List<BlockResponse> fetchAllBlocks(PageDto pageDto){
+        Pageable pageable = PageRequest.of(pageDto.getPageNo(), pageDto.getPageSize(), Sort.by("id").descending());
+        List<BlockResponse> blockResponseList = new ArrayList<>();
+        blockRepository.findAll(pageable).stream().forEach(b->blockResponseList.add(getBlockResponse(b,"read all blocks")));
+        return blockResponseList;
     }
 
     private Booking findBooking(String bookingId) {
@@ -180,7 +198,7 @@ public class BookingService {
     private Date resolveDate(String date) throws ParseException {
 
         if (!isValidFormat("dd/MM/yyyy", date)) {
-            throw new BookingApplicationException("Date format is invalid");
+            throw new BookingApplicationException("Date format is invalid for: "+ date+" ,use  dd/MM/yyyy");
         }
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         String todayDate = formatter.format(new Date());
