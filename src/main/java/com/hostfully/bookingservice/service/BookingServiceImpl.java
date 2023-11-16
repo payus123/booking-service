@@ -1,10 +1,14 @@
 package com.hostfully.bookingservice.service;
 
+import com.google.gson.Gson;
+import com.hostfully.bookingservice.configs.RedisPublisher;
+import com.hostfully.bookingservice.configs.SSEClients;
 import com.hostfully.bookingservice.enums.BookingAction;
 import com.hostfully.bookingservice.enums.BookingStatus;
 import com.hostfully.bookingservice.exception.BookingApplicationException;
 import com.hostfully.bookingservice.models.Block;
 import com.hostfully.bookingservice.models.Booking;
+import com.hostfully.bookingservice.models.SSEvent;
 import com.hostfully.bookingservice.models.dtos.request.BlockRequest;
 import com.hostfully.bookingservice.models.dtos.request.BookingRequest;
 import com.hostfully.bookingservice.models.dtos.request.BookingUpdateRequest;
@@ -39,6 +43,10 @@ import static com.hostfully.bookingservice.models.dtos.response.BookingResponse.
 public class BookingServiceImpl implements  BookingService {
     private final BlockRepository blockRepository;
     private final BookingRepository bookingRepository;
+    private final SSEClients sseClients;
+    private final Gson gson = new Gson();
+    private final RedisPublisher redisPublisher;
+
 
 
     public static void checkStartDateIsBeforeEndDate(Date startDate, Date endDate) {
@@ -214,6 +222,13 @@ public class BookingServiceImpl implements  BookingService {
         }
         return dateResolved;
     }
+
+    public void publishTransactionEvent(SSEvent event) {
+       redisPublisher.publish(event.getAccountNumber(),gson.toJson(event));
+    }
+
+
+
 
 
 }
