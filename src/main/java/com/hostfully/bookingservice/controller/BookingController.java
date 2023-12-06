@@ -9,6 +9,7 @@ import com.hostfully.bookingservice.models.dtos.response.BlockResponse;
 import com.hostfully.bookingservice.models.dtos.response.BookingResponse;
 import com.hostfully.bookingservice.service.BookingService;
 import com.hostfully.bookingservice.utils.ResponseBuilder;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ import static com.hostfully.bookingservice.configs.Routes.UPDATE_BOOKING;
 
 @RestController
 @RequestMapping(BASE_ROUTE)
+@Tag(name = "Booking Management")
 @RequiredArgsConstructor
 public class BookingController {
  private final BookingService bookingService;
